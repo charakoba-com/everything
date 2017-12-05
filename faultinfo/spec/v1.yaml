@@ -1,0 +1,240 @@
+openapi: 3.0.0
+info:
+  title: fault information API
+  version: 1.0.0
+paths:
+  /info:
+    get:
+      responses:
+        '200':
+          description: information list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Information'
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/CreateInformation'
+      responses:
+        '201':
+          description: new information created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/InformationCreated'
+  /info/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: information detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationDetail'
+        '404':
+          description: information not found
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      requestBody:
+        $ref: '#/components/requestBodies/CreateInformation'
+      responses:
+        '200':
+          description: information updated
+        '404':
+          description: information not found
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '404':
+          description: information not found
+  /type:
+    get:
+      responses:
+        '200':
+          description: defined information type list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/CreateInfoType'
+      responses:
+        '201':
+          description: new information type created
+        '409':
+          description: type conflict
+    delete:
+      requestBody:
+        $ref: '#/components/requestBodies/DeleteInfoType'
+      responses:
+        '200':
+          description: type deleted
+        '404':
+          description: type not found
+  /template:
+    get:
+      responses:
+        '200':
+          description: information template ID list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/CreateTemplate'
+      responses:
+        '201':
+          description: new template created
+        '409':
+          description: template id conflict
+  /template/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: template detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/TemplateDetail'
+        '404':
+          description: template not found
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateTemplate'
+      responses:
+        '200':
+          description: template updated
+        '404':
+          description: template not found
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: template deleted
+        '404':
+          description: template not found
+components:
+  schemas:
+    Information:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        begin:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        detail:
+          type: string
+    InformationDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        begin:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        detail:
+          type: string
+        template_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        creator:
+          type: string
+        updater:
+          type: string
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+        body:
+          type: string
+        vars:
+          type: array
+          items:
+            type: string
+  responses:
+    InformationCreated:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id: string
+  requestBodies:
+    CreateInformation:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              template_id:
+                type: string
+              vars:
+                type: object
+                additionalProperties: true
+    CreateInfoType:
+      content:
+        application/json:
+          schema:
+            type: string
+    CreateTemplate:
+      content:
+        application/json:
+          schema:
+            id:
+              type: string
+            template:
+              type: string
+    UpdateTemplate:
+      Content:
+        application/json:
+          schema:
+            template:
+              type: string
