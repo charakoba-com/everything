@@ -57,6 +57,8 @@ paths:
           in: path
           required: true
       responses:
+        '200':
+          description: information deleted
         '404':
           description: information not found
   /type:
