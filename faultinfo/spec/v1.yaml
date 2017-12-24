@@ -61,6 +61,68 @@ paths:
           description: information deleted
         '404':
           description: information not found
+  /info/{id}/comments:
+    get:
+      responses:
+        '200':
+          description: comment list for information {id}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comments'
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/CreateComment'
+      responses:
+        '201':
+          description: new comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/CommentCreated'
+  /info/{info_id}/comments/{comment_id}:
+    get:
+      parameters:
+        - name: info_id
+          in: path
+          required: true
+        - name: comment_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: comment detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentDetail'
+        '404':
+          description: comment not found
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      requestBody:
+        $ref: '#/components/requestBodies/CreateComment'
+      responses:
+        '200':
+          description: comment updated
+        '404':
+          description: comment not found
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: comment deleted
+        '404':
+          description: comment not found
+
   /type:
     get:
       responses:
@@ -188,6 +250,29 @@ components:
           type: string
         updater:
           type: string
+        comments:
+          type: array
+          items:
+            type: string  
+    CommentDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        comment:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        creator:
+          type: string
+        updater:
+          type: string
+        public:
+          type: boolean
     Template:
       type: object
       properties:
@@ -201,6 +286,13 @@ components:
             type: string
   responses:
     InformationCreated:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id: string
+    CommentCreated:
       content:
         application/json:
           schema:
@@ -226,6 +318,14 @@ components:
         application/json:
           schema:
             type: string
+    CreateComment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              comment:
+                type: string
     CreateTemplate:
       content:
         application/json:
