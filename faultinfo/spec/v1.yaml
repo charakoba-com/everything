@@ -3,9 +3,20 @@ info:
   title: fault information API
   description: Fault information of services.
   version: 1.0.0
+tags:
+  - name: informations
+    description: information endpoints
+  - name: comments
+    description: comments for information
+  - name: templates
+    description: information templates
+  - name: types
+    description: information types
 paths:
   /info:
     get:
+      tags:
+        - informations
       responses:
         '200':
           description: information list
@@ -16,6 +27,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Information'
     post:
+      tags:
+        - informations
       requestBody:
         $ref: '#/components/requestBodies/CreateInformation'
       responses:
@@ -27,6 +40,8 @@ paths:
                 $ref: '#/components/responses/InformationCreated'
   '/info/{id}':
     get:
+      tags:
+        - informations
       responses:
         '200':
           description: information detail
@@ -37,6 +52,8 @@ paths:
         '404':
           description: information not found
     put:
+      tags:
+        - informations
       requestBody:
         $ref: '#/components/requestBodies/CreateInformation'
       responses:
@@ -45,6 +62,8 @@ paths:
         '404':
           description: information not found
     delete:
+      tags:
+        - informations
       responses:
         '200':
           description: information deleted
@@ -58,6 +77,8 @@ paths:
           type: string
   '/info/{id}/comments':
     get:
+      tags:
+        - comments
       responses:
         '200':
           description: 'comment list for information {id}'
@@ -68,6 +89,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Comment'
     post:
+      tags:
+        - comments
       requestBody:
         $ref: '#/components/requestBodies/CreateComment'
       responses:
@@ -85,6 +108,8 @@ paths:
           type: string
   '/info/{info_id}/comments/{comment_id}':
     get:
+      tags:
+        - comments
       responses:
         '200':
           description: comment detail
@@ -95,6 +120,8 @@ paths:
         '404':
           description: comment not found
     put:
+      tags:
+        - comments
       requestBody:
         $ref: '#/components/requestBodies/CreateComment'
       responses:
@@ -103,6 +130,8 @@ paths:
         '404':
           description: comment not found
     delete:
+      tags:
+        - comments
       responses:
         '200':
           description: comment deleted
@@ -121,6 +150,8 @@ paths:
           type: string
   /type:
     get:
+      tags:
+        - types
       responses:
         '200':
           description: defined information type list
@@ -131,6 +162,8 @@ paths:
                 items:
                   type: string
     post:
+      tags:
+        - types
       requestBody:
         $ref: '#/components/requestBodies/CreateInfoType'
       responses:
@@ -139,6 +172,8 @@ paths:
         '409':
           description: type conflict
     delete:
+      tags:
+        - types
       requestBody:
         $ref: '#/components/requestBodies/DeleteInfoType'
       responses:
@@ -148,6 +183,8 @@ paths:
           description: type not found
   /template:
     get:
+      tags:
+        - templates
       responses:
         '200':
           description: information template ID list
@@ -158,6 +195,8 @@ paths:
                 items:
                   type: string
     post:
+      tags:
+        - templates
       requestBody:
         $ref: '#/components/requestBodies/CreateTemplate'
       responses:
@@ -167,6 +206,8 @@ paths:
           description: template id conflict
   '/template/{id}':
     get:
+      tags:
+        - templates
       description: get template detail
       responses:
         '200':
@@ -178,6 +219,8 @@ paths:
         '404':
           description: template not found
     delete:
+      tags:
+        - templates
       description: delete template
       responses:
         '200':
