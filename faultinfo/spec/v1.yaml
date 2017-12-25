@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/responses/InformationCreated'
       security:
-        BearerAuth: []
+        - BearerAuth: []
   '/info/{id}':
     get:
       tags:
