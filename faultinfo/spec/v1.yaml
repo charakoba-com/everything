@@ -26,10 +26,6 @@ paths:
                 $ref: '#/components/responses/InformationCreated'
   /info/{id}:
     get:
-      parameters:
-        - name: id
-          in: path
-          required: true
       responses:
         '200':
           description: information detail
@@ -40,10 +36,6 @@ paths:
         '404':
           description: information not found
     put:
-      parameters:
-        - name: id
-          in: path
-          required: true
       requestBody:
         $ref: '#/components/requestBodies/CreateInformation'
       responses:
@@ -52,15 +44,17 @@ paths:
         '404':
           description: information not found
     delete:
-      parameters:
-        - name: id
-          in: path
-          required: true
       responses:
         '200':
           description: information deleted
         '404':
           description: information not found
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /info/{id}/comments:
     get:
       responses:
@@ -71,7 +65,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Comments'
+                  type: string
     post:
       requestBody:
         $ref: '#/components/requestBodies/CreateComment'
@@ -82,15 +76,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/CommentCreated'
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /info/{info_id}/comments/{comment_id}:
     get:
-      parameters:
-        - name: info_id
-          in: path
-          required: true
-        - name: comment_id
-          in: path
-          required: true
+
       responses:
         '200':
           description: comment detail
@@ -101,10 +95,6 @@ paths:
         '404':
           description: comment not found
     put:
-      parameters:
-        - name: id
-          in: path
-          required: true
       requestBody:
         $ref: '#/components/requestBodies/CreateComment'
       responses:
@@ -113,16 +103,22 @@ paths:
         '404':
           description: comment not found
     delete:
-      parameters:
-        - name: id
-          in: path
-          required: true
       responses:
         '200':
           description: comment deleted
         '404':
           description: comment not found
-
+    parameters:
+      - name: info_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: comment_id
+        in: path
+        required: true
+        schema:
+          type: string
   /type:
     get:
       responses:
@@ -171,24 +167,16 @@ paths:
           description: template id conflict
   /template/{id}:
     get:
-      parameters:
-        - name: id
-          in: path
-          required: true
       responses:
         '200':
           description: template detail
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/TemplateDetail'
+                $ref: '#/components/schemas/Template'
         '404':
           description: template not found
     put:
-      parameters:
-        - name: id
-          in: path
-          required: true
       requestBody:
         $ref: '#/components/requestBodies/UpdateTemplate'
       responses:
@@ -197,15 +185,17 @@ paths:
         '404':
           description: template not found
     delete:
-      parameters:
-        - name: id
-          in: path
-          required: true
       responses:
         '200':
           description: template deleted
         '404':
           description: template not found
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
 components:
   schemas:
     Information:
@@ -253,7 +243,7 @@ components:
         comments:
           type: array
           items:
-            type: string  
+            type: string
     CommentDetail:
       type: object
       properties:
@@ -286,19 +276,23 @@ components:
             type: string
   responses:
     InformationCreated:
+      description: response shows new information is successfully created
       content:
         application/json:
           schema:
             type: object
             properties:
-              id: string
+              id:
+                type: string
     CommentCreated:
+      description: response shows new comment is successfully created
       content:
         application/json:
           schema:
             type: object
             properties:
-              id: string
+              id:
+                type: string
   requestBodies:
     CreateInformation:
       content:
@@ -318,6 +312,11 @@ components:
         application/json:
           schema:
             type: string
+    DeleteInfoType:
+      content:
+        application/json:
+          schema:
+            type: string
     CreateComment:
       content:
         application/json:
@@ -330,13 +329,17 @@ components:
       content:
         application/json:
           schema:
-            id:
-              type: string
-            template:
-              type: string
+            type: object
+            properties:
+              id:
+                type: string
+              template:
+                type: string
     UpdateTemplate:
-      Content:
+      content:
         application/json:
           schema:
-            template:
-              type: string
+            type: object
+            properties:
+              template:
+                type: string
