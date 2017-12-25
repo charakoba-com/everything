@@ -38,6 +38,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/InformationCreated'
+      security:
+        BearerAuth: []
   '/info/{id}':
     get:
       tags:
@@ -61,6 +63,8 @@ paths:
           description: information updated
         '404':
           description: information not found
+      security:
+        - BearerAuth: []
     delete:
       tags:
         - informations
@@ -69,6 +73,8 @@ paths:
           description: information deleted
         '404':
           description: information not found
+      security:
+        - BearerAuth: []
     parameters:
       - name: id
         in: path
@@ -100,6 +106,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/CommentCreated'
+      security:
+        - BearerAuth: []
     parameters:
       - name: id
         in: path
@@ -129,6 +137,8 @@ paths:
           description: comment updated
         '404':
           description: comment not found
+      security:
+        - BearerAuth: []
     delete:
       tags:
         - comments
@@ -137,6 +147,8 @@ paths:
           description: comment deleted
         '404':
           description: comment not found
+      security:
+        - BearerAuth: []
     parameters:
       - name: info_id
         in: path
@@ -171,6 +183,8 @@ paths:
           description: new information type created
         '409':
           description: type conflict
+      security:
+        - BearerAuth: []
     delete:
       tags:
         - types
@@ -181,6 +195,8 @@ paths:
           description: type deleted
         '404':
           description: type not found
+      security:
+        - BearerAuth: []
   /template:
     get:
       tags:
@@ -204,6 +220,8 @@ paths:
           description: new template created
         '409':
           description: template id conflict
+      security:
+        - BearerAuth: []
   '/template/{id}':
     get:
       tags:
@@ -227,6 +245,8 @@ paths:
           description: template deleted
         '404':
           description: template not found
+      security:
+        - BearerAuth: []
     parameters:
       - name: id
         in: path
@@ -391,3 +411,7 @@ components:
             properties:
               template:
                 type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
