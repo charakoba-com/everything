@@ -1,6 +1,7 @@
 openapi: 3.0.0
 info:
   title: fault information API
+  description: Fault information of services.
   version: 1.0.0
 paths:
   /info:
@@ -24,7 +25,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/InformationCreated'
-  /info/{id}:
+  '/info/{id}':
     get:
       responses:
         '200':
@@ -55,17 +56,17 @@ paths:
         required: true
         schema:
           type: string
-  /info/{id}/comments:
+  '/info/{id}/comments':
     get:
       responses:
         '200':
-          description: comment list for information {id}
+          description: 'comment list for information {id}'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/Comment'
     post:
       requestBody:
         $ref: '#/components/requestBodies/CreateComment'
@@ -82,9 +83,8 @@ paths:
         required: true
         schema:
           type: string
-  /info/{info_id}/comments/{comment_id}:
+  '/info/{info_id}/comments/{comment_id}':
     get:
-
       responses:
         '200':
           description: comment detail
@@ -165,8 +165,9 @@ paths:
           description: new template created
         '409':
           description: template id conflict
-  /template/{id}:
+  '/template/{id}':
     get:
+      description: get template detail
       responses:
         '200':
           description: template detail
@@ -176,15 +177,8 @@ paths:
                 $ref: '#/components/schemas/Template'
         '404':
           description: template not found
-    put:
-      requestBody:
-        $ref: '#/components/requestBodies/UpdateTemplate'
-      responses:
-        '200':
-          description: template updated
-        '404':
-          description: template not found
     delete:
+      description: delete template
       responses:
         '200':
           description: template deleted
@@ -244,6 +238,17 @@ components:
           type: array
           items:
             type: string
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        comment:
+          type: string
+        creator:
+          type: string
+        public:
+          type: boolean
     CommentDetail:
       type: object
       properties:
