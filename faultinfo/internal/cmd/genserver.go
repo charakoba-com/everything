@@ -153,7 +153,7 @@ func writeRoutes(out io.Writer, paths openapi.Paths) {
 
 func writeRoute(out io.Writer, method, path string) {
 	fmt.Fprintf(out,
-		"\ts.Router.HandleFunc(\"%s\", %s).Method(\"%s\")\n",
+		"\ts.Router.HandleFunc(\"%s\", %s).Methods(\"%s\")\n",
 		path,
 		strings.ToLower(method)+strings.Join(strings.Split(strings.Replace(strings.Replace(path, "{", "", -1), "}", "", -1), "/"), ""),
 		method,

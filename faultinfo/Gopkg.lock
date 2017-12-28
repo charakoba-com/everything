@@ -23,7 +23,13 @@
   branch = "master"
   name = "github.com/nasa9084/go-openapi"
   packages = ["."]
-  revision = "3221b4c21794beea40136a13fee73a1460d0f2da"
+  revision = "15fc954ae90cf93175564c68f37f564345b4a1c4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/web-apps-tech/identity"
+  packages = ["log"]
+  revision = "20f58b0712bb626b4b6242002b1be3adba2ac972"
 
 [[projects]]
   branch = "v2"
@@ -34,6 +40,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d62b7f1cb6ad84418e995034e3af7dbd493c13652980468638ed80d4ab68de81"
+  inputs-digest = "b79ceab7aabca716941ce84b7671eeddc612ee0bd296cbf1255b1f1154f498cb"
   solver-name = "gps-cdcl"
   solver-version = 1
