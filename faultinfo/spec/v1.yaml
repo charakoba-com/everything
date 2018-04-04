@@ -276,45 +276,61 @@ components:
       type: object
       properties:
         id:
+          title: ID
           type: string
         type:
+          title: Type
           type: string
         begin:
+          title: Begin
           type: string
           format: date-time
         end:
+          title: End
           type: string
           format: date-time
         detail:
+          title: Detail
           type: string
     InformationDetail:
       type: object
       properties:
         id:
+          title: ID
           type: string
         type:
+          title: Type
           type: string
         begin:
+          title: Begin
           type: string
           format: date-time
         end:
+          title: End
           type: string
           format: date-time
         detail:
+          title: Detail
           type: string
         template_id:
+          title: TemplateID
           type: string
         created_at:
+          title: CreatedAt
           type: string
           format: date-time
         updated_at:
+          title: UpdatedAt
           type: string
           format: date-time
         creator:
+          title: Creator
           type: string
         updater:
+          title: Updater
           type: string
         comments:
+          title: Comments
           type: array
           items:
             type: string
@@ -322,40 +338,54 @@ components:
       type: object
       properties:
         id:
+          title: ID
           type: string
         comment:
+          title: Comment
           type: string
         creator:
+          title: Creator
           type: string
         public:
+          title: Public
           type: boolean
     CommentDetail:
       type: object
       properties:
         id:
+          title: ID
           type: string
         comment:
+          title: Comment
           type: string
         created_at:
+          title: CreatedAt
           type: string
           format: date-time
         updated_at:
+          title: UpdatedAt
           type: string
           format: date-time
         creator:
+          title: Creator
           type: string
         updater:
+          title: Updater
           type: string
         public:
+          title: Public
           type: boolean
     Template:
       type: object
       properties:
         id:
+          title: ID
           type: string
         body:
+          title: Body
           type: string
         vars:
+          title: Vars
           type: array
           items:
             type: string
@@ -368,6 +398,7 @@ components:
             type: object
             properties:
               id:
+                title: ID
                 type: string
     CommentCreated:
       description: response shows new comment is successfully created
@@ -377,6 +408,7 @@ components:
             type: object
             properties:
               id:
+                title: ID
                 type: string
   requestBodies:
     CreateInformation:
@@ -386,10 +418,13 @@ components:
             type: object
             properties:
               type:
+                title: Type
                 type: string
               template_id:
+                title: TemplateID
                 type: string
               vars:
+                title: Vars
                 type: object
                 additionalProperties: true
     CreateInfoType:
@@ -409,6 +444,7 @@ components:
             type: object
             properties:
               comment:
+                title: Comment
                 type: string
     CreateTemplate:
       content:
@@ -417,8 +453,10 @@ components:
             type: object
             properties:
               id:
+                title: ID
                 type: string
               template:
+                title: Template
                 type: string
     UpdateTemplate:
       content:
@@ -427,6 +465,7 @@ components:
             type: object
             properties:
               template:
+                title: Template
                 type: string
   securitySchemes:
     BearerAuth:
