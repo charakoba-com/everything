@@ -137,7 +137,7 @@ func generateRequestBodies(requestBodies map[string]*openapi.RequestBody) error 
 	if err != nil {
 		return err
 	}
-	return writeTo(src, "input/requestbody.go")
+	return writeTo(src, "input/requestbody_gen.go")
 }
 
 func generateRequestBody(buf *bytes.Buffer, name string, requestBody *openapi.RequestBody) error {
