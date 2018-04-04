@@ -42,7 +42,7 @@ paths:
                 $ref: '#/components/responses/InformationCreated'
       security:
         - BearerAuth: []
-  '/info/{id}':
+  /info/{id}:
     get:
       operationId: GetInformationDetail
       tags:
