@@ -2,44 +2,26 @@
 
 
 [[projects]]
-  name = "github.com/gorilla/context"
-  packages = ["."]
-  revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
-  version = "v1.1"
-
-[[projects]]
-  name = "github.com/gorilla/mux"
-  packages = ["."]
-  revision = "7f08801859139f86dfafd1c296e2cba9a80d292e"
-  version = "v1.6.0"
-
-[[projects]]
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
-  revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
-  version = "v1.3.0"
+  revision = "c6ca198ec95c841fdb89fc0de7496fed11ab854e"
+  version = "v1.4.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/nasa9084/go-openapi"
   packages = ["."]
-  revision = "15fc954ae90cf93175564c68f37f564345b4a1c4"
+  revision = "867c08381814269f710fd7ab5f7f5639398058fd"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/web-apps-tech/identity"
-  packages = ["log"]
-  revision = "20f58b0712bb626b4b6242002b1be3adba2ac972"
-
-[[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b79ceab7aabca716941ce84b7671eeddc612ee0bd296cbf1255b1f1154f498cb"
+  inputs-digest = "76dc259da354a5aaea369e6829d61ee77a53b5f56d89c63f9d1553c6bcde2edc"
   solver-name = "gps-cdcl"
   solver-version = 1
