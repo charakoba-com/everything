@@ -197,12 +197,17 @@ paths:
           description: type conflict
       security:
         - BearerAuth: []
+  /type/{typ}:
     delete:
       operationId: DeleteInformationType
       tags:
         - types
-      requestBody:
-        $ref: '#/components/requestBodies/DeleteInfoType'
+      parameters:
+        - name: typ
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: type deleted
