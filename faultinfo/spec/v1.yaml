@@ -15,6 +15,7 @@ tags:
 paths:
   /info:
     get:
+      operationId: GetInformationList
       tags:
         - informations
       responses:
@@ -27,6 +28,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Information'
     post:
+      operationId: CreateInformation
       tags:
         - informations
       requestBody:
@@ -42,6 +44,7 @@ paths:
         - BearerAuth: []
   '/info/{id}':
     get:
+      operationId: GetInformationDetail
       tags:
         - informations
       responses:
@@ -54,6 +57,7 @@ paths:
         '404':
           description: information not found
     put:
+      operationId:  UpdateInformation
       tags:
         - informations
       requestBody:
@@ -66,6 +70,7 @@ paths:
       security:
         - BearerAuth: []
     delete:
+      operationId: DeleteInformation
       tags:
         - informations
       responses:
@@ -83,6 +88,7 @@ paths:
           type: string
   '/info/{id}/comments':
     get:
+      operationId: GetCommentList
       tags:
         - comments
       responses:
@@ -95,6 +101,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Comment'
     post:
+      operationId: CreateComment
       tags:
         - comments
       requestBody:
@@ -116,6 +123,7 @@ paths:
           type: string
   '/info/{info_id}/comments/{comment_id}':
     get:
+      operationId: GetCommentDetail
       tags:
         - comments
       responses:
@@ -128,6 +136,7 @@ paths:
         '404':
           description: comment not found
     put:
+      operationId: UpdateComment
       tags:
         - comments
       requestBody:
@@ -140,6 +149,7 @@ paths:
       security:
         - BearerAuth: []
     delete:
+      operationId: DeleteComment
       tags:
         - comments
       responses:
@@ -162,6 +172,7 @@ paths:
           type: string
   /type:
     get:
+      operationId: GetInformationTypelist
       tags:
         - types
       responses:
@@ -174,6 +185,7 @@ paths:
                 items:
                   type: string
     post:
+      operationId: CreateInformationType
       tags:
         - types
       requestBody:
@@ -186,6 +198,7 @@ paths:
       security:
         - BearerAuth: []
     delete:
+      operationId: DeleteInformationType
       tags:
         - types
       requestBody:
@@ -199,6 +212,7 @@ paths:
         - BearerAuth: []
   /template:
     get:
+      operationId: GetInformationTemplateIDList
       tags:
         - templates
       responses:
@@ -211,6 +225,7 @@ paths:
                 items:
                   type: string
     post:
+      operationId: CreateInformationTemplate
       tags:
         - templates
       requestBody:
@@ -224,6 +239,7 @@ paths:
         - BearerAuth: []
   '/template/{id}':
     get:
+      operationId: GetInformationTemplateDetail
       tags:
         - templates
       description: get template detail
@@ -237,6 +253,7 @@ paths:
         '404':
           description: template not found
     delete:
+      operationId: DeleteInformationTemplate
       tags:
         - templates
       description: delete template
