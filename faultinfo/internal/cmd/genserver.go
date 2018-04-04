@@ -2,217 +2,430 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"io"
+	"go/format"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"unicode"
 
 	flags "github.com/jessevdk/go-flags"
 	openapi "github.com/nasa9084/go-openapi"
 )
 
-// Error type for this package
-type Error string
-
-func (e Error) Error() string { return string(e) }
-
-// Error constants
 const (
-	ErrVersion Error = "OpenAPI Version must be 3.0.0"
+	arrayType       = "array"
+	objectType      = "object"
+	stringType      = "string"
+	applicationjson = "application/json"
 )
 
 type options struct {
 	SpecFile string `short:"f" long:"file"`
 }
 
-func main() { os.Exit(_main()) }
+func main() { os.Exit(exec()) }
 
-func _main() int {
+func exec() int {
 	var opts options
 	if _, err := flags.Parse(&opts); err != nil {
-		log.Println(err)
+		log.Print(err)
 		return 1
 	}
-	spec, err := openapi.Load(opts.SpecFile)
+	doc, err := openapi.Load(opts.SpecFile)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 		return 1
 	}
-	if err := generate(spec); err != nil {
-		log.Println(err)
+	if err := generate(doc); err != nil {
+		log.Print(err)
 		return 1
 	}
 	return 0
 }
 
-func generate(spec *openapi.Document) error {
-	if spec.Version != "3.0.0" {
-		return ErrVersion
-	}
-	if err := generateServer(spec); err != nil {
+func writeTo(src []byte, filename string) error {
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
 		return err
 	}
-	if _, err := os.Stat("handlers_gen.go"); os.IsNotExist(err) {
-		if err := generateHandlers(spec); err != nil {
+	defer f.Close()
+
+	_, err = f.Write(src)
+	return err
+}
+
+func generate(doc *openapi.Document) error {
+	if err := generateRoutes(doc.Paths); err != nil {
+		return err
+	}
+	if err := generateRequestBodies(doc.Components.RequestBodies); err != nil {
+		return err
+	}
+	if err := generateResponses(doc.Components.Responses); err != nil {
+		return err
+	}
+	if err := generateSchemas(doc.Components.Schemas); err != nil {
+		return err
+	}
+	if err := generateHandlers(doc.Paths); err != nil {
+		return err
+	}
+	if _, err := os.Stat("logic_gen.go"); os.IsNotExist(err) {
+		if err := generateLogics(doc.Paths); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func generateServer(spec *openapi.Document) error {
-	buf := bytes.Buffer{}
+func generateRoutes(paths openapi.Paths) error {
+	var buf bytes.Buffer
 	buf.WriteString(`package faultinfo
-// DO NOT EDITS. Automatically generated.
-
-`)
-	stdlibs := []string{
-		"net/http",
-	}
-	extlibs := []string{
-		"github.com/gorilla/mux",
-	}
-	writeImports(&buf, stdlibs, extlibs)
-	buf.WriteString(`type Server struct {
-	*mux.Router
-}
-
-func New() *Server {
-	s := &Server{
-		Router: mux.NewRouter(),
-	}
-	s.bindRoutes()
-	return s
-}
-
-func (s *Server) Run(l string) error {
-	return http.ListenAndServe(l, s.Router)
-}
-
-func (s *Server) bindRoutes() {
-`)
-	writeRoutes(&buf, spec.Paths)
-	buf.WriteString("}\n")
-
-	file, err := os.OpenFile("faultinfo_gen.go", os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = io.Copy(file, &buf)
-	return err
-}
-
-func writeImports(out io.Writer, stdlibs, extlibs []string) {
-	if len(stdlibs) == 0 && len(extlibs) == 0 {
-		return
-	}
-
-	fmt.Fprintln(out, "import (")
-	for _, p := range stdlibs {
-		fmt.Fprintf(out, "\t\"%s\"\n", p)
-	}
-	if len(stdlibs) > 0 && len(extlibs) > 0 {
-		fmt.Fprint(out, "\n")
-	}
-	for _, p := range extlibs {
-		fmt.Fprintf(out, "\t\"%s\"\n", p)
-	}
-	fmt.Fprintf(out, ")\n\n")
-}
-
-func writeRoutes(out io.Writer, paths openapi.Paths) {
-	for path, item := range paths {
-		if item.Get != nil {
-			writeRoute(out, "GET", path)
-		}
-		if item.Put != nil {
-			writeRoute(out, "PUT", path)
-		}
-		if item.Post != nil {
-			writeRoute(out, "POST", path)
-		}
-		if item.Delete != nil {
-			writeRoute(out, "DELETE", path)
-		}
-		if item.Options != nil {
-			writeRoute(out, "OPTIONS", path)
-		}
-		if item.Head != nil {
-			writeRoute(out, "HEAD", path)
-		}
-		if item.Patch != nil {
-			writeRoute(out, "PATCH", path)
-		}
-		if item.Trace != nil {
-			writeRoute(out, "TRACE", path)
-		}
-	}
-}
-
-func writeRoute(out io.Writer, method, path string) {
-	fmt.Fprintf(out,
-		"\ts.Router.HandleFunc(\"%s\", %s).Methods(\"%s\")\n",
-		path,
-		strings.ToLower(method)+strings.Join(strings.Split(strings.Replace(strings.Replace(path, "{", "", -1), "}", "", -1), "/"), ""),
-		method,
-	)
-}
-
-func generateHandlers(spec *openapi.Document) error {
-	buf := bytes.Buffer{}
-	fmt.Fprintf(&buf, `package faultinfo
+// Code generated genserver.go. DO NOT EDIT.
 
 import (
-	"net/http"
-)
+"net/http"
 
-`)
-
-	writeHandlers(&buf, spec.Paths)
-
-	file, err := os.OpenFile("handlers_gen.go", os.O_RDWR|os.O_CREATE, 0600)
+"github.com/gorilla/mux"
+)`)
+	buf.WriteString("\n\nfunc bindroutes(router *mux.Router) {")
+	for path, pathitem := range paths {
+		if pathitem.Get != nil {
+			generateRoute(&buf, path, pathitem.Get.OperationID, http.MethodGet)
+		}
+		if pathitem.Post != nil {
+			generateRoute(&buf, path, pathitem.Post.OperationID, http.MethodPost)
+		}
+		if pathitem.Put != nil {
+			generateRoute(&buf, path, pathitem.Put.OperationID, http.MethodPut)
+		}
+		if pathitem.Delete != nil {
+			generateRoute(&buf, path, pathitem.Delete.OperationID, http.MethodDelete)
+		}
+	}
+	buf.WriteString("\n}")
+	src, err := format.Source(buf.Bytes())
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-	_, err = io.Copy(file, &buf)
-	return err
+	return writeTo(src, "routings_gen.go")
 }
 
-func writeHandlers(out io.Writer, paths openapi.Paths) {
-	for path, item := range paths {
-		if item.Get != nil {
-			writeHandlerSkel(out, "GET", path, item)
-		}
-		if item.Put != nil {
-			writeHandlerSkel(out, "PUT", path, item)
-		}
-		if item.Post != nil {
-			writeHandlerSkel(out, "POST", path, item)
-		}
-		if item.Delete != nil {
-			writeHandlerSkel(out, "DELETE", path, item)
-		}
-		if item.Options != nil {
-			writeHandlerSkel(out, "OPTIONS", path, item)
-		}
-		if item.Head != nil {
-			writeHandlerSkel(out, "HEAD", path, item)
-		}
-		if item.Patch != nil {
-			writeHandlerSkel(out, "PATCH", path, item)
-		}
-		if item.Trace != nil {
-			writeHandlerSkel(out, "TRACE", path, item)
+func generateRoute(buf *bytes.Buffer, path, opid, method string) {
+	buf.WriteString(fmt.Sprintf(
+		"\nrouter.HandlerFunc(%s, %s).Methods(http.Method%s)",
+		strconv.Quote(path), opid, method,
+	))
+}
+
+func generateRequestBodies(requestBodies map[string]*openapi.RequestBody) error {
+	var buf bytes.Buffer
+	buf.WriteString(`package faultinfo
+// Code generated by genserver.go. DO NOT EDIT.
+`)
+	for name, requestBody := range requestBodies {
+		if err := generateRequestBody(&buf, name, requestBody); err != nil {
+			return err
 		}
 	}
+
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	return writeTo(src, "input/requestbody.go")
 }
 
-func writeHandlerSkel(out io.Writer, method, path string, item *openapi.PathItem) {
-	fmt.Fprintf(out, "func %s(w http.ResponseWriter, r *http.Request) {\n",
-		strings.ToLower(method)+strings.Join(strings.Split(strings.Replace(strings.Replace(path, "{", "", -1), "}", "", -1), "/"), ""),
-	)
-	fmt.Fprint(out, "}\n\n")
+func generateRequestBody(buf *bytes.Buffer, name string, requestBody *openapi.RequestBody) error {
+	buf.WriteString(fmt.Sprintf("\n\ntype %s ", name))
+	switch requestBody.Content[applicationjson].Schema.Type {
+	case objectType:
+		buf.WriteString("struct {")
+		for _, p := range requestBody.Content[applicationjson].Schema.Properties {
+			if p.Type == objectType && p.EnableAdditionalProperties {
+				buf.WriteString(fmt.Sprintf("\n%s map[string]string", p.Title))
+				continue
+			}
+			buf.WriteString(fmt.Sprintf("\n%s %s", p.Title, p.Type))
+		}
+		buf.WriteString("\n}")
+	default:
+		buf.WriteString(requestBody.Content[applicationjson].Schema.Type)
+	}
+	return nil
+}
+
+func generateResponses(responses map[string]*openapi.Response) error {
+	var buf bytes.Buffer
+	buf.WriteString(`package output
+// Code generated by genserver.go. DO NOT EDIT.
+`)
+	for name, response := range responses {
+		if err := generateResponse(&buf, name, response); err != nil {
+			return err
+		}
+	}
+
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	return writeTo(src, "output/response_gen.go")
+}
+
+func generateResponse(buf *bytes.Buffer, name string, response *openapi.Response) error {
+	buf.WriteString(fmt.Sprintf("\n\ntype %s struct {", name))
+	for n, p := range response.Content[applicationjson].Schema.Properties {
+		buf.WriteString(fmt.Sprintf("\n%s %s `json:%s`", p.Title, p.Type, strconv.Quote(n)))
+	}
+	buf.WriteString("\n}")
+	return nil
+}
+
+func generateSchemas(schemas map[string]*openapi.Schema) error {
+	var buf bytes.Buffer
+	buf.WriteString(`package schema
+// Code generated by genserver.go. DO NOT EDIT.
+`)
+	for name, schema := range schemas {
+		if err := generateSchema(&buf, name, schema); err != nil {
+			return err
+		}
+	}
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	return writeTo(src, "schema/schema_gen.go")
+}
+
+func generateSchema(buf *bytes.Buffer, name string, schema *openapi.Schema) error {
+	buf.WriteString(fmt.Sprintf("\n\ntype %s ", name))
+	if schema.Type != objectType {
+		buf.WriteString(schema.Type)
+		return nil
+	}
+	buf.WriteString("struct {")
+	for n, p := range schema.Properties {
+		buf.WriteString("\n" + p.Title)
+		switch p.Type {
+		case stringType:
+			var typ string
+			switch p.Format {
+			case "":
+				typ = stringType
+			case "date-time":
+				typ = "time.Time"
+			}
+			buf.WriteString(fmt.Sprintf(" %s", typ))
+		case arrayType:
+			buf.WriteString(fmt.Sprintf(" []%s", p.Items.Type))
+		default:
+			buf.WriteString(fmt.Sprintf(" %s", p.Type))
+		}
+		buf.WriteString(fmt.Sprintf(" `json:%s`", strconv.Quote(n)))
+	}
+	buf.WriteString("\n}")
+	return nil
+}
+
+func generateHandlers(paths openapi.Paths) error {
+	var buf bytes.Buffer
+	buf.WriteString(`package faultinfo
+// Code generated by genserver.go. DO NOT EDIT.
+
+import (
+"net/http"
+)
+`)
+	for _, pathitem := range paths {
+		if err := generateHandler(&buf, pathitem.Get, pathitem.Parameters); err != nil {
+			return err
+		}
+		if err := generateHandler(&buf, pathitem.Post, pathitem.Parameters); err != nil {
+			return err
+		}
+		if err := generateHandler(&buf, pathitem.Put, pathitem.Parameters); err != nil {
+			return err
+		}
+		if err := generateHandler(&buf, pathitem.Delete, pathitem.Parameters); err != nil {
+			return err
+		}
+	}
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	return writeTo(src, "handlers_gen.go")
+}
+
+func generateHandler(buf *bytes.Buffer, op *openapi.Operation, pathParam []*openapi.Parameter) error {
+	if op == nil {
+		// skip if undefined path
+		return nil
+	}
+
+	buf.WriteString(fmt.Sprintf("\n\nfunc %sHandler(w http.ResponseWriter, r *http.Request) {", op.OperationID))
+
+	// request header
+	generateParseHeader(buf, op.Security)
+	parameters := append(pathParam, op.Parameters...)
+	// request path variable
+	for _, p := range parameters {
+		if p.In == "path" {
+			if p.Name == "" {
+				return errors.New("path parameter name is empty")
+			}
+			if p.Name == "type" {
+				return errors.New("cannot use `type` as path parameter name")
+			}
+			buf.WriteString(fmt.Sprintf("\n%s := mux.Vars(r)[%s]", camelCase(p.Name), strconv.Quote(p.Name)))
+		}
+	}
+
+	// request body
+	if op.RequestBody != nil {
+		buf.WriteString("\nvar req " + strings.Split(op.RequestBody.Ref, "/")[3])
+		buf.WriteString("\nif err := json.NewDecoder(r.Body).Decode(&req); err != nil {")
+		buf.WriteString("\nw.WriteHeader(http.StatusBadRequest)")
+		buf.WriteString("\nreturn")
+		buf.WriteString("\n}")
+	}
+
+	isFirstArg := true
+	buf.WriteString(fmt.Sprintf("\nout, err := logic.%s(", op.OperationID))
+	for _, p := range parameters {
+		if !isFirstArg {
+			buf.WriteString(", ")
+		}
+		buf.WriteString(p.Name)
+		isFirstArg = false
+	}
+	if op.RequestBody != nil {
+		if !isFirstArg {
+			buf.WriteString(", ")
+		}
+		buf.WriteString("req")
+	}
+	buf.WriteString(")")
+	buf.WriteString("\nif err != nil {")
+	buf.WriteString("\nw.WriteHeader(http.StatusInternalServerError)")
+	buf.WriteString("\nreturn")
+	buf.WriteString("\n}")
+	buf.WriteString("\n}")
+
+	return nil
+}
+
+func generateParseHeader(buf *bytes.Buffer, security *openapi.SecurityRequirement) {
+	if security == nil || (*security)[0]["BearerAuth"] == nil {
+		return
+	}
+	buf.WriteString(fmt.Sprintf("\nauthHeader := strings.Split(r.Header.Get(%s))", strconv.Quote("Authorization")))
+	buf.WriteString(fmt.Sprintf("\nif len(authHeader) != 2 || authHeader[0] != %s {", strconv.Quote("Bearer")))
+	buf.WriteString("\nw.WriteHeader(http.StatusUnauthorized)")
+	buf.WriteString("\nreturn")
+	buf.WriteString("\n}")
+	buf.WriteString("\nbearerToken := authHeader[1]")
+}
+
+func camelCase(snakeCase string) string {
+	var s []rune
+	var afterUS bool
+	for _, r := range snakeCase {
+		if r == '_' {
+			afterUS = true
+			continue
+		}
+		if afterUS {
+			r = unicode.ToUpper(r)
+		}
+		s = append(s, r)
+		afterUS = false
+	}
+	return string(s)
+}
+
+func generateLogics(paths openapi.Paths) error {
+	var buf bytes.Buffer
+	buf.WriteString(`package faultinfo
+// Code generated by genserver.go. DO NOT EDIT.
+`)
+	for _, pathitem := range paths {
+		if err := generateLogic(&buf, pathitem.Get, pathitem.Parameters); err != nil {
+			return err
+		}
+		if err := generateLogic(&buf, pathitem.Post, pathitem.Parameters); err != nil {
+			return err
+		}
+		if err := generateLogic(&buf, pathitem.Put, pathitem.Parameters); err != nil {
+			return err
+		}
+		if err := generateLogic(&buf, pathitem.Delete, pathitem.Parameters); err != nil {
+			return err
+		}
+	}
+
+	src, err := format.Source(buf.Bytes())
+	//src = buf.Bytes()
+	//err = nil
+	if err != nil {
+		return err
+	}
+
+	return writeTo(src, "logic_gen.go")
+}
+
+func generateLogic(buf *bytes.Buffer, op *openapi.Operation, pathParam []*openapi.Parameter) error {
+	if op == nil {
+		return nil
+	}
+	params := append(op.Parameters, pathParam...)
+	buf.WriteString(fmt.Sprintf("\n\nfunc %s(", op.OperationID))
+	for i, param := range params {
+		if i != 0 {
+			buf.WriteString(", ")
+		}
+		buf.WriteString(fmt.Sprintf("%s %s", camelCase(param.Name), param.Schema.Type))
+	}
+	buf.WriteString(")")
+
+	okResp, ok := op.Responses["200"]
+	if !ok {
+		okResp, ok = op.Responses["201"]
+		if !ok {
+			return errors.New("no ok or created response")
+		}
+	}
+	if okResp.Content != nil {
+		buf.WriteString("(")
+		schema := okResp.Content[applicationjson].Schema
+		if schema.Ref != "" {
+			ref := strings.Split(schema.Ref, "/")
+			buf.WriteString(fmt.Sprintf("%s.%s", ref[2], ref[3]))
+		} else {
+			switch schema.Type {
+			case arrayType:
+				buf.WriteString("[]")
+				if schema.Items.Type != "" {
+					buf.WriteString(schema.Items.Type)
+				} else {
+					itemRef := strings.Split(schema.Items.Ref, "/")
+					buf.WriteString(fmt.Sprintf("%s.%s", itemRef[2], itemRef[3]))
+				}
+			default:
+				buf.WriteString(schema.Type)
+			}
+		}
+		buf.WriteString(", error)")
+	} else {
+		buf.WriteString("error")
+	}
+	buf.WriteString(" {")
+	buf.WriteString("\n}")
+	return nil
 }
