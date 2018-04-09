@@ -70,6 +70,7 @@ anaconda-mode/
 ### Go ###
 # Binaries for programs and plugins
 *.exe
+*.exe~
 *.dll
 *.so
 *.dylib
@@ -79,9 +80,6 @@ anaconda-mode/
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-
-# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
-.glide/
 
 ### macOS ###
 *.DS_Store
@@ -112,10 +110,8 @@ Temporary Items
 
 ### Vim ###
 # swap
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
+.sw[a-p]
+.*.sw[a-p]
 # session
 Session.vim
 # temporary
@@ -123,4 +119,6 @@ Session.vim
 # auto-generated tag files
 tags
 
+
 # End of https://www.gitignore.io/api/macos,emacs,vim,go
+vendor
