@@ -6,22 +6,6 @@ import (
 	"github.com/charakoba-com/everything/faultinfo/schemas"
 )
 
-func GetInformationTemplateDetail(id string) (out schemas.Template, err error) {
-	return
-}
-
-func DeleteInformationTemplate(id string) (err error) {
-	return
-}
-
-func GetInformationList() (out []schemas.Information, err error) {
-	return
-}
-
-func CreateInformation(req input.CreateInformation) (out output.InformationCreated, err error) {
-	return
-}
-
 func GetInformationDetail(id string) (out schemas.InformationDetail, err error) {
 	return
 }
@@ -71,5 +55,21 @@ func GetInformationTemplateIDList() (out []string, err error) {
 }
 
 func CreateInformationTemplate(req input.CreateTemplate) (err error) {
+	return
+}
+
+func GetInformationTemplateDetail(id string) (out schemas.Template, err error) {
+	return
+}
+
+func DeleteInformationTemplate(id string) (err error) {
+	return
+}
+
+func GetInformationList() (out []schemas.Information, err error) {
+	return
+}
+
+func CreateInformation(req input.CreateInformation) (out output.InformationCreated, err error) {
 	return
 }

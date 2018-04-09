@@ -13,67 +13,10 @@ import (
 	"github.com/charakoba-com/everything/faultinfo/input"
 )
 
+const bearerType = "Bearer"
+
 func Authenticate(token string) bool {
 	return true
-}
-
-func GetInformationDetailHandler(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-	out, err := GetInformationDetail(id)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(out); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	buf.WriteTo(w)
-}
-
-func UpdateInformationHandler(w http.ResponseWriter, r *http.Request) {
-	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	bearerToken := authHeader[1]
-	if !Authenticate(bearerToken) {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	id := mux.Vars(r)["id"]
-	var req input.CreateInformation
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	err := UpdateInformation(id, req)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-}
-
-func DeleteInformationHandler(w http.ResponseWriter, r *http.Request) {
-	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	bearerToken := authHeader[1]
-	if !Authenticate(bearerToken) {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	id := mux.Vars(r)["id"]
-	err := DeleteInformation(id)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 }
 
 func GetCommentListHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,12 +37,13 @@ func GetCommentListHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -142,12 +86,13 @@ func GetCommentDetailHandler(w http.ResponseWriter, r *http.Request) {
 
 func UpdateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -167,12 +112,13 @@ func UpdateCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -202,12 +148,13 @@ func GetInformationTypelistHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateInformationTypeHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -225,12 +172,13 @@ func CreateInformationTypeHandler(w http.ResponseWriter, r *http.Request) {
 
 func DeleteInformationTypeHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -259,12 +207,13 @@ func GetInformationTemplateIDListHandler(w http.ResponseWriter, r *http.Request)
 
 func CreateInformationTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -298,12 +247,13 @@ func GetInformationTemplateDetailHandler(w http.ResponseWriter, r *http.Request)
 
 func DeleteInformationTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -332,12 +282,13 @@ func GetInformationListHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateInformationHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != "Bearer" {
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	bearerToken := authHeader[1]
 	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -358,4 +309,65 @@ func CreateInformationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 	buf.WriteTo(w)
+}
+
+func GetInformationDetailHandler(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	out, err := GetInformationDetail(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(out); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	buf.WriteTo(w)
+}
+
+func UpdateInformationHandler(w http.ResponseWriter, r *http.Request) {
+	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	bearerToken := authHeader[1]
+	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	id := mux.Vars(r)["id"]
+	var req input.CreateInformation
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err := UpdateInformation(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func DeleteInformationHandler(w http.ResponseWriter, r *http.Request) {
+	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	bearerToken := authHeader[1]
+	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	id := mux.Vars(r)["id"]
+	err := DeleteInformation(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
