@@ -20,9 +20,8 @@ func exec() int {
 		log.Print(err)
 		return 1
 	}
-	s := faultinfo.New()
-	log.Printf("server listening at %s", opts.Listen)
-	if err := s.Run(opts.Listen); err != nil {
+	s := faultinfo.New(opts.Listen)
+	if err := s.Run(); err != nil {
 		log.Print(err)
 		return 1
 	}
