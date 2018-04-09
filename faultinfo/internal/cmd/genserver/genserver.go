@@ -255,6 +255,8 @@ import (
 "github.com/charakoba-com/everything/faultinfo/input"
 )
 
+const bearerType = "Bearer"
+
 func Authenticate(token string) bool {
 return true
 }
@@ -370,12 +372,13 @@ func generateParseHeader(buf *bytes.Buffer, security *openapi.SecurityRequiremen
 		return
 	}
 	buf.WriteString(fmt.Sprintf("\nauthHeader := strings.Split(r.Header.Get(%s), %s)", strconv.Quote("Authorization"), strconv.Quote(" ")))
-	buf.WriteString(fmt.Sprintf("\nif len(authHeader) != 2 || authHeader[0] != %s {", strconv.Quote("Bearer")))
+	buf.WriteString("\nif len(authHeader) != 2 || authHeader[0] != bearerType {")
 	buf.WriteString("\nw.WriteHeader(http.StatusUnauthorized)")
 	buf.WriteString("\nreturn")
 	buf.WriteString("\n}")
 	buf.WriteString("\nbearerToken := authHeader[1]")
 	buf.WriteString("\nif !Authenticate(bearerToken) {")
+	buf.WriteString(fmt.Sprintf("\nw.Header().Set(%s, %s)", strconv.Quote("WWW-Authenticate"), strconv.Quote("Bearer realm=\"ident\"")))
 	buf.WriteString("\nw.WriteHeader(http.StatusUnauthorized)")
 	buf.WriteString("\nreturn")
 	buf.WriteString("\n}")
