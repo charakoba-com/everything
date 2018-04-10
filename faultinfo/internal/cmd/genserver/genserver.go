@@ -412,6 +412,8 @@ func generateLogics(paths openapi.Paths) error {
 	buf.WriteString(`package faultinfo
 
 import (
+"context"
+
 "github.com/charakoba-com/everything/faultinfo/input"
 "github.com/charakoba-com/everything/faultinfo/output"
 "github.com/charakoba-com/everything/faultinfo/schemas"
