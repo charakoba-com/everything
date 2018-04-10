@@ -508,5 +508,5 @@ func ref2type(refStr string) string {
 		return ""
 	}
 	ref := strings.Split(strings.Replace(refStr, "responses", "output", -1), "/")
-	return fmt.Sprintf("%s.%s", ref[2], ref[3])
+	return fmt.Sprintf("*%s.%s", ref[2], ref[3])
 }
