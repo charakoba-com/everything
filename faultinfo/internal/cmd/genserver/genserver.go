@@ -330,6 +330,7 @@ func generateHandler(buf *buffer, op *openapi.Operation, pathParam []*openapi.Pa
 
 	buf.WriteStringf("err := %s(", op.OperationID)
 	var args []string
+	args = append(args, "r.Context()")
 	for _, p := range parameters {
 		args = append(args, camelCase(p.Name))
 	}
@@ -446,7 +447,7 @@ func generateLogic(buf *buffer, op *openapi.Operation, pathParam []*openapi.Para
 		return nil
 	}
 	params := append(op.Parameters, pathParam...)
-	buf.WriteStringf("\n\nfunc %s(", op.OperationID)
+	buf.WriteStringf("\n\nfunc %s(ctx context.Context, ", op.OperationID)
 	var args []string
 	for _, param := range params {
 		args = append(args, fmt.Sprintf("%s %s", camelCase(param.Name), param.Schema.Type))
