@@ -19,58 +19,10 @@ func Authenticate(token string) bool {
 	return true
 }
 
-func GetCommentListHandler(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-	out, err := GetCommentList(id)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(out); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	buf.WriteTo(w)
-}
-
-func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
-	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(authHeader) != 2 || authHeader[0] != bearerType {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	bearerToken := authHeader[1]
-	if !Authenticate(bearerToken) {
-		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	id := mux.Vars(r)["id"]
-	var req input.CreateComment
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	out, err := CreateComment(id, req)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(out); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusCreated)
-	buf.WriteTo(w)
-}
-
 func GetCommentDetailHandler(w http.ResponseWriter, r *http.Request) {
 	infoId := mux.Vars(r)["info_id"]
 	commentId := mux.Vars(r)["comment_id"]
-	out, err := GetCommentDetail(infoId, commentId)
+	out, err := GetCommentDetail(r.Context(), infoId, commentId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -103,7 +55,7 @@ func UpdateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err := UpdateComment(infoId, commentId, req)
+	err := UpdateComment(r.Context(), infoId, commentId, req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -124,7 +76,7 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	infoId := mux.Vars(r)["info_id"]
 	commentId := mux.Vars(r)["comment_id"]
-	err := DeleteComment(infoId, commentId)
+	err := DeleteComment(r.Context(), infoId, commentId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -132,7 +84,7 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetInformationTypelistHandler(w http.ResponseWriter, r *http.Request) {
-	out, err := GetInformationTypelist()
+	out, err := GetInformationTypelist(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -163,7 +115,7 @@ func CreateInformationTypeHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err := CreateInformationType(req)
+	err := CreateInformationType(r.Context(), req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -183,7 +135,7 @@ func DeleteInformationTypeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	typ := mux.Vars(r)["typ"]
-	err := DeleteInformationType(typ)
+	err := DeleteInformationType(r.Context(), typ)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -191,7 +143,7 @@ func DeleteInformationTypeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetInformationTemplateIDListHandler(w http.ResponseWriter, r *http.Request) {
-	out, err := GetInformationTemplateIDList()
+	out, err := GetInformationTemplateIDList(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -222,7 +174,7 @@ func CreateInformationTemplateHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err := CreateInformationTemplate(req)
+	err := CreateInformationTemplate(r.Context(), req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -231,7 +183,7 @@ func CreateInformationTemplateHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetInformationTemplateDetailHandler(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	out, err := GetInformationTemplateDetail(id)
+	out, err := GetInformationTemplateDetail(r.Context(), id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -258,7 +210,7 @@ func DeleteInformationTemplateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := mux.Vars(r)["id"]
-	err := DeleteInformationTemplate(id)
+	err := DeleteInformationTemplate(r.Context(), id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -266,7 +218,7 @@ func DeleteInformationTemplateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetInformationListHandler(w http.ResponseWriter, r *http.Request) {
-	out, err := GetInformationList()
+	out, err := GetInformationList(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -297,7 +249,7 @@ func CreateInformationHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	out, err := CreateInformation(req)
+	out, err := CreateInformation(r.Context(), req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -313,7 +265,7 @@ func CreateInformationHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetInformationDetailHandler(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	out, err := GetInformationDetail(id)
+	out, err := GetInformationDetail(r.Context(), id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -345,7 +297,7 @@ func UpdateInformationHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err := UpdateInformation(id, req)
+	err := UpdateInformation(r.Context(), id, req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -365,9 +317,57 @@ func DeleteInformationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := mux.Vars(r)["id"]
-	err := DeleteInformation(id)
+	err := DeleteInformation(r.Context(), id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func GetCommentListHandler(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	out, err := GetCommentList(r.Context(), id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(out); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	buf.WriteTo(w)
+}
+
+func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+	authHeader := strings.Split(r.Header.Get("Authorization"), " ")
+	if len(authHeader) != 2 || authHeader[0] != bearerType {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	bearerToken := authHeader[1]
+	if !Authenticate(bearerToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer realm=\"ident\"")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	id := mux.Vars(r)["id"]
+	var req input.CreateComment
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	out, err := CreateComment(r.Context(), id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(out); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	buf.WriteTo(w)
 }

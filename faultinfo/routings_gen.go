@@ -9,6 +9,9 @@ import (
 )
 
 func bindroutes(router *mux.Router) {
+	router.HandleFunc("/type/{typ}", DeleteInformationTypeHandler).Methods(http.MethodDelete)
+	router.HandleFunc("/template", GetInformationTemplateIDListHandler).Methods(http.MethodGet)
+	router.HandleFunc("/template", CreateInformationTemplateHandler).Methods(http.MethodPost)
 	router.HandleFunc("/template/{id}", GetInformationTemplateDetailHandler).Methods(http.MethodGet)
 	router.HandleFunc("/template/{id}", DeleteInformationTemplateHandler).Methods(http.MethodDelete)
 	router.HandleFunc("/info", GetInformationListHandler).Methods(http.MethodGet)
@@ -23,7 +26,4 @@ func bindroutes(router *mux.Router) {
 	router.HandleFunc("/info/{info_id}/comments/{comment_id}", DeleteCommentHandler).Methods(http.MethodDelete)
 	router.HandleFunc("/type", GetInformationTypelistHandler).Methods(http.MethodGet)
 	router.HandleFunc("/type", CreateInformationTypeHandler).Methods(http.MethodPost)
-	router.HandleFunc("/type/{typ}", DeleteInformationTypeHandler).Methods(http.MethodDelete)
-	router.HandleFunc("/template", GetInformationTemplateIDListHandler).Methods(http.MethodGet)
-	router.HandleFunc("/template", CreateInformationTemplateHandler).Methods(http.MethodPost)
 }

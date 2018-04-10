@@ -6,6 +6,28 @@ import (
 	"time"
 )
 
+type Information struct {
+	ID     string    `json:"id"`
+	Type   string    `json:"type"`
+	Begin  time.Time `json:"begin"`
+	End    time.Time `json:"end"`
+	Detail string    `json:"detail"`
+}
+
+type InformationDetail struct {
+	Begin      time.Time `json:"begin"`
+	TemplateID string    `json:"template_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	Updater    string    `json:"updater"`
+	Comments   []string  `json:"comments"`
+	ID         string    `json:"id"`
+	Type       string    `json:"type"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	Creator    string    `json:"creator"`
+	End        time.Time `json:"end"`
+	Detail     string    `json:"detail"`
+}
+
 type Comment struct {
 	Public  bool   `json:"public"`
 	ID      string `json:"id"`
@@ -14,39 +36,17 @@ type Comment struct {
 }
 
 type CommentDetail struct {
-	UpdatedAt time.Time `json:"updated_at"`
-	Creator   string    `json:"creator"`
-	Updater   string    `json:"updater"`
 	Public    bool      `json:"public"`
 	ID        string    `json:"id"`
 	Comment   string    `json:"comment"`
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Creator   string    `json:"creator"`
+	Updater   string    `json:"updater"`
 }
 
 type Template struct {
 	ID   string   `json:"id"`
 	Body string   `json:"body"`
 	Vars []string `json:"vars"`
-}
-
-type Information struct {
-	Begin  time.Time `json:"begin"`
-	End    time.Time `json:"end"`
-	Detail string    `json:"detail"`
-	ID     string    `json:"id"`
-	Type   string    `json:"type"`
-}
-
-type InformationDetail struct {
-	End        time.Time `json:"end"`
-	Detail     string    `json:"detail"`
-	TemplateID string    `json:"template_id"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	Creator    string    `json:"creator"`
-	Updater    string    `json:"updater"`
-	Comments   []string  `json:"comments"`
-	ID         string    `json:"id"`
-	Type       string    `json:"type"`
-	Begin      time.Time `json:"begin"`
 }
